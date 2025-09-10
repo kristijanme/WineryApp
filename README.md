@@ -41,15 +41,18 @@ Simple full-stack CRUD app to manage wines.
 - The backend and frontend have to run simultaneously on different terminals so that the app has all the functionalities
 
 ### Run backend
-# from repo root
+- From app root
 dotnet run --project WineryApp.Api
 
 ### Run frontend
-# from the repo root
+- From app root
 cd frontend
 npm start
 
 ### Testing
+- From app root
+cd WineryApp.Tests
 dotnet test
+
 
 
