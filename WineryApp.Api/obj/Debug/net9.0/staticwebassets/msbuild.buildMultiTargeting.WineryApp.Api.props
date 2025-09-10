@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\WineryApp.Api.props" />
+</Project>

@@ -1,0 +1,21 @@
+# .NET
+**/bin/
+**/obj/
+*.user
+*.vs/
+.vscode/
+appsettings.*.json
+*.db
+*.sqlite
+
+# Node
+/frontend/node_modules/
+frontend/build/
+frontend/.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "/DDanINTzH9+v1d7nyXcIURP2uw1C4S0ITcFe0cQy8I=",
+  "Source": "WineryApp.Api",
+  "BasePath": "_content/WineryApp.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

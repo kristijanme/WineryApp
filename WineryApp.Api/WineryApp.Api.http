@@ -1,0 +1,6 @@
+@WineryApp.Api_HostAddress = http://localhost:5152
+
+GET {{WineryApp.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
