@@ -38,7 +38,7 @@ Simple full-stack CRUD app to manage wines.
 ### Requirements
 - .NET 9 SDK  
 - Node.js (>=16)
-- The backend and frontend have to run simultaneously
+- The backend and frontend have to run simultaneously on different terminals so that the app has all the functionalities
 
 ### Run backend
 # from repo root
@@ -51,4 +51,5 @@ npm start
 
 ### Testing
 dotnet test
+
 
