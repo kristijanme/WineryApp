@@ -10,11 +10,17 @@ Simple full-stack CRUD app to manage wines.
 ---
 
 ## Screenshots of the app functionality
+- Home page
 ![Home page](docs/App_home.png)
+- Add wine
 ![Add wine](docs/App_add.png)
+- Edit wine
 ![Edit wine](docs/App_edit_wine.png)
+- Edited wine
 ![Edited wine](docs/App_edited_wine.png)
+- Search wine
 ![Search wine](docs/App_search.png)
+- Filter by type
 ![Filter by type](docs/App_filter_by_type.png)
 
 ---
@@ -45,3 +51,4 @@ npm start
 
 ### Testing
 dotnet test
+
