@@ -10,7 +10,7 @@
   position: relative;
   color: white;
   overflow: hidden;
-  animation: zoomIn 30s ease-in-out infinite alternate; /* 🎥 smooth zoom animation */
+  animation: zoomIn 30s ease-in-out infinite alternate; 
 }
 
 @keyframes zoomIn {
@@ -34,7 +34,7 @@
   z-index: 1;
   text-align: center;
   padding: 2rem;
-  animation: fadeIn 2.5s ease-in-out; /* ✨ text fade-in */
+  animation: fadeIn 2.5s ease-in-out; 
 }
 
 @keyframes fadeIn {
