@@ -1,0 +1,59 @@
+.homepage-hero {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  color: white;
+  overflow: hidden;
+  transition: transform 10s ease-in-out;
+}
+
+.homepage-hero:hover {
+  transform: scale(1.05);
+}
+
+.homepage-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.homepage-overlay {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 2rem;
+}
+
+.hero-title {
+  font-size: 3.2rem;
+  font-weight: bold;
+  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
+}
+
+.hero-subtitle {
+  font-size: 1.4rem;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  margin-top: 1rem;
+}
+
+.homepage-overlay {
+  animation: fadeIn 1.8s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
