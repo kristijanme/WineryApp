@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import AddOrderForm from "../components/Orders/AddOrderForm";
+import OrderItemsList from "../components/Orders/OrderItemsList";
 
 function OrdersPage() {
   const [orders, setOrders] = useState([]);
-
-  // ---- State за уредување ----
   const [editingId, setEditingId] = useState(null);
   const [editedStatus, setEditedStatus] = useState("");
   const [editedTotal, setEditedTotal] = useState("");
 
-  // ---- Fetch сите orders ----
   const fetchOrders = async () => {
     try {
       const res = await axios.get("http://localhost:5152/api/orders");
@@ -24,21 +22,18 @@ function OrdersPage() {
     fetchOrders();
   }, []);
 
-  // ---- Start уредување ----
   const startEdit = (order) => {
     setEditingId(order.id);
     setEditedStatus(order.status || "Pending");
     setEditedTotal(order.totalAmount ?? 0);
   };
 
-  // ---- Откажи уредување ----
   const cancelEdit = () => {
     setEditingId(null);
     setEditedStatus("");
     setEditedTotal("");
   };
 
-  // ---- Зачувај промени (PUT) ----
   const saveEdit = async (id) => {
     try {
       const original = orders.find((o) => o.id === id);
@@ -47,7 +42,7 @@ function OrdersPage() {
       const payload = {
         id: original.id,
         customerName: original.customerName,
-        user: original.user,
+        userId: original.user?.id ?? original.userId,
         orderDate: original.orderDate,
         status: editedStatus,
         totalAmount: parseFloat(editedTotal),
@@ -62,13 +57,12 @@ function OrdersPage() {
     }
   };
 
-  // ---- DELETE ORDER ----
   const deleteOrder = async (id) => {
     if (!window.confirm("Are you sure you want to delete this order?")) return;
 
     try {
       await axios.delete(`http://localhost:5152/api/orders/${id}`);
-      await fetchOrders(); // refresh листата
+      await fetchOrders();
     } catch (err) {
       console.error("Error deleting order:", err);
     }
@@ -99,76 +93,84 @@ function OrdersPage() {
             {orders.map((order) => {
               const isEditing = editingId === order.id;
               return (
-                <tr key={order.id}>
-                  <td>{order.id}</td>
-                  <td>{order.customerName}</td>
-                  <td>{order.user?.username || "—"}</td>
-                  <td>{new Date(order.orderDate).toLocaleString()}</td>
+                <React.Fragment key={order.id}>
+                  <tr>
+                    <td>{order.id}</td>
+                    <td>{order.customerName}</td>
+                    <td>{order.user?.username || "—"}</td>
+                    <td>{new Date(order.orderDate).toLocaleString()}</td>
 
-                  <td>
-                    {isEditing ? (
-                      <select
-                        className="form-select form-select-sm"
-                        value={editedStatus}
-                        onChange={(e) => setEditedStatus(e.target.value)}
-                      >
-                        <option>Pending</option>
-                        <option>Completed</option>
-                        <option>Cancelled</option>
-                      </select>
-                    ) : (
-                      order.status
-                    )}
-                  </td>
+                    <td>
+                      {isEditing ? (
+                        <select
+                          className="form-select form-select-sm"
+                          value={editedStatus}
+                          onChange={(e) => setEditedStatus(e.target.value)}
+                        >
+                          <option>Pending</option>
+                          <option>Completed</option>
+                          <option>Cancelled</option>
+                        </select>
+                      ) : (
+                        order.status
+                      )}
+                    </td>
 
-                  <td>
-                    {isEditing ? (
-                      <input
-                        type="number"
-                        step="0.01"
-                        className="form-control form-control-sm"
-                        value={editedTotal}
-                        onChange={(e) => setEditedTotal(e.target.value)}
-                      />
-                    ) : (
-                      (order.totalAmount ?? 0).toFixed(2)
-                    )}
-                  </td>
+                    <td>
+                      {isEditing ? (
+                        <input
+                          type="number"
+                          step="0.01"
+                          className="form-control form-control-sm"
+                          value={editedTotal}
+                          onChange={(e) => setEditedTotal(e.target.value)}
+                        />
+                      ) : (
+                        (order.totalAmount ?? 0).toFixed(2)
+                      )}
+                    </td>
 
-                  <td>
-                    {isEditing ? (
-                      <>
-                        <button
-                          className="btn btn-sm btn-success me-2"
-                          onClick={() => saveEdit(order.id)}
-                        >
-                          Save
-                        </button>
-                        <button
-                          className="btn btn-sm btn-secondary"
-                          onClick={cancelEdit}
-                        >
-                          Cancel
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          className="btn btn-sm btn-outline-primary me-2"
-                          onClick={() => startEdit(order)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="btn btn-sm btn-outline-danger"
-                          onClick={() => deleteOrder(order.id)}
-                        >
-                          Delete
-                        </button>
-                      </>
-                    )}
-                  </td>
-                </tr>
+                    <td>
+                      {isEditing ? (
+                        <>
+                          <button
+                            className="btn btn-sm btn-success me-2"
+                            onClick={() => saveEdit(order.id)}
+                          >
+                            Save
+                          </button>
+                          <button
+                            className="btn btn-sm btn-secondary"
+                            onClick={cancelEdit}
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            className="btn btn-sm btn-outline-primary me-2"
+                            onClick={() => startEdit(order)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={() => deleteOrder(order.id)}
+                          >
+                            Delete
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td colSpan="7">
+                      <OrderItemsList orderId={order.id} />
+                    </td>
+                  </tr>
+                </React.Fragment>
               );
             })}
           </tbody>

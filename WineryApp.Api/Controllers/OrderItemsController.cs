@@ -1,56 +1,76 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WineryApp.Api.Data;
 using WineryApp.Api.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-[Route("api/[controller]")]
-[ApiController]
-public class OrderItemsController : ControllerBase
+namespace WineryApp.Api.Controllers
 {
-    private readonly AppDbContext _context;
-
-    public OrderItemsController(AppDbContext context)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class OrderItemsController : ControllerBase
     {
-        _context = context;
-    }
+        private readonly AppDbContext _context;
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<OrderItem>>> GetOrderItems() => await _context.OrderItems.Include(oi => oi.Wine).Include(oi => oi.Order).ToListAsync();
+        public OrderItemsController(AppDbContext context)
+        {
+            _context = context;
+        }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<OrderItem>> GetOrderItem(int id)
-    {
-        var item = await _context.OrderItems.Include(oi => oi.Wine).Include(oi => oi.Order).FirstOrDefaultAsync(oi => oi.Id == id);
-        if (item == null) return NotFound();
-        return item;
-    }
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<OrderItem>>> GetOrderItems()
+        {
+            var data = await _context.OrderItems
+                .Include(oi => oi.Wine)
+                .Include(oi => oi.Order)
+                .OrderBy(oi => oi.Id)
+                .ToListAsync();
 
-    [HttpPost]
-    public async Task<ActionResult<OrderItem>> PostOrderItem(OrderItem item)
-    {
-        _context.OrderItems.Add(item);
-        await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetOrderItem), new { id = item.Id }, item);
-    }
+            return data;
+        }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutOrderItem(int id, OrderItem item)
-    {
-        if (id != item.Id) return BadRequest();
-        _context.Entry(item).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
-        return NoContent();
-    }
+        [HttpGet("byOrder/{orderId}")]
+        public async Task<ActionResult<IEnumerable<OrderItem>>> GetByOrder(int orderId)
+        {
+            var data = await _context.OrderItems
+                .Where(oi => oi.OrderId == orderId)
+                .Include(oi => oi.Wine)
+                .OrderBy(oi => oi.Id)
+                .ToListAsync();
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteOrderItem(int id)
-    {
-        var item = await _context.OrderItems.FindAsync(id);
-        if (item == null) return NotFound();
-        _context.OrderItems.Remove(item);
-        await _context.SaveChangesAsync();
-        return NoContent();
+            return data;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<OrderItem>> PostOrderItem([FromBody] OrderItem orderItem)
+        {
+            if (orderItem.WineId <= 0 || orderItem.OrderId <= 0)
+                return BadRequest("WineId and OrderId are required and must be valid.");
+
+            orderItem.Wine = null;
+            orderItem.Order = null;
+
+            _context.OrderItems.Add(orderItem);
+            await _context.SaveChangesAsync();
+
+            var createdItem = await _context.OrderItems
+                .Include(oi => oi.Wine)
+                .Include(oi => oi.Order)
+                .FirstOrDefaultAsync(oi => oi.Id == orderItem.Id);
+
+            return CreatedAtAction(nameof(GetOrderItems), new { id = orderItem.Id }, createdItem);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteOrderItem(int id)
+        {
+            var item = await _context.OrderItems.FindAsync(id);
+            if (item == null)
+                return NotFound();
+
+            _context.OrderItems.Remove(item);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }

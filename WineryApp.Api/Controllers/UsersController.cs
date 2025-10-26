@@ -18,14 +18,12 @@ namespace WineryApp.Api.Controllers
             _context = context;
         }
 
-        // GET: api/users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
         }
 
-        // GET: api/users/5
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
@@ -34,7 +32,6 @@ namespace WineryApp.Api.Controllers
             return user;
         }
 
-        // POST: api/users
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
@@ -43,7 +40,6 @@ namespace WineryApp.Api.Controllers
             return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
 
-        // PUT: api/users/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
@@ -53,7 +49,6 @@ namespace WineryApp.Api.Controllers
             return NoContent();
         }
 
-        // DELETE: api/users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {

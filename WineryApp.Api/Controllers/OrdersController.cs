@@ -2,9 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WineryApp.Api.Data;
 using WineryApp.Api.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace WineryApp.Api.Controllers
 {
@@ -22,10 +19,14 @@ namespace WineryApp.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
-            return await _context.Orders
+            var data = await _context.Orders
                 .Include(o => o.User)
                 .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Wine)
+                .OrderBy(o => o.Id)
                 .ToListAsync();
+
+            return data;
         }
 
         [HttpGet("{id}")]
@@ -34,54 +35,56 @@ namespace WineryApp.Api.Controllers
             var order = await _context.Orders
                 .Include(o => o.User)
                 .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Wine)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
-            if (order == null)
-                return NotFound();
-
+            if (order == null) return NotFound();
             return order;
         }
 
         [HttpPost]
-        public async Task<ActionResult<Order>> PostOrder(Order order)
+        public async Task<ActionResult<Order>> PostOrder([FromBody] Order order)
         {
-            if (order.User == null)
-                return BadRequest("Order must have a user.");
+            if (order.UserId == 0 && order.User != null)
+                order.UserId = order.User.Id;
 
-            var existingUser = await _context.Users.FindAsync(order.User.Id);
-            if (existingUser == null)
-                return BadRequest("User not found.");
+            order.User = null;
 
-            order.User = existingUser;
-
-            order.OrderItems ??= new List<OrderItem>();
+            if (order.OrderItems != null)
+            {
+                foreach (var it in order.OrderItems)
+                {
+                    it.Id = 0;
+                    it.Order = null!;
+                    it.Wine = null!;
+                }
+            }
 
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetOrder), new { id = order.Id }, order);
+            var created = await _context.Orders
+                .Include(o => o.User)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Wine)
+                .FirstAsync(o => o.Id == order.Id);
+
+            return CreatedAtAction(nameof(GetOrder), new { id = order.Id }, created);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrder(int id, Order order)
+        public async Task<IActionResult> PutOrder(int id, [FromBody] Order incoming)
         {
-            if (id != order.Id)
-                return BadRequest();
+            var db = await _context.Orders
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.Id == id);
 
-            _context.Entry(order).State = EntityState.Modified;
+            if (db == null) return NotFound();
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Orders.Any(e => e.Id == id))
-                    return NotFound();
-                else
-                    throw;
-            }
+            db.Status = incoming.Status;
+            db.TotalAmount = incoming.TotalAmount;
 
+            await _context.SaveChangesAsync();
             return NoContent();
         }
 
@@ -89,12 +92,10 @@ namespace WineryApp.Api.Controllers
         public async Task<IActionResult> DeleteOrder(int id)
         {
             var order = await _context.Orders.FindAsync(id);
-            if (order == null)
-                return NotFound();
+            if (order == null) return NotFound();
 
             _context.Orders.Remove(order);
             await _context.SaveChangesAsync();
-
             return NoContent();
         }
     }

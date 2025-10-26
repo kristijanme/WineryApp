@@ -22,31 +22,6 @@ namespace WineryApp.Api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("WineryApp.Api.Models.ActivityLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Action")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ActionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ActivityLogs");
-                });
-
             modelBuilder.Entity("WineryApp.Api.Models.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -67,7 +42,6 @@ namespace WineryApp.Api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalAmount")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("UserId")
@@ -92,7 +66,6 @@ namespace WineryApp.Api.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Quantity")
@@ -165,12 +138,14 @@ namespace WineryApp.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("StockQuantity")
@@ -190,17 +165,30 @@ namespace WineryApp.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Wines");
-                });
 
-            modelBuilder.Entity("WineryApp.Api.Models.ActivityLog", b =>
-                {
-                    b.HasOne("WineryApp.Api.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IsDeleted = false,
+                            Name = "Merlot",
+                            Price = 149.99m,
+                            StockQuantity = 50,
+                            Type = "Red",
+                            Winery = "Tikves",
+                            Year = 2020
+                        },
+                        new
+                        {
+                            Id = 2,
+                            IsDeleted = false,
+                            Name = "Chardonnay",
+                            Price = 129.99m,
+                            StockQuantity = 40,
+                            Type = "White",
+                            Winery = "Bovin",
+                            Year = 2021
+                        });
                 });
 
             modelBuilder.Entity("WineryApp.Api.Models.Order", b =>
@@ -208,7 +196,7 @@ namespace WineryApp.Api.Migrations
                     b.HasOne("WineryApp.Api.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -223,9 +211,9 @@ namespace WineryApp.Api.Migrations
                         .IsRequired();
 
                     b.HasOne("WineryApp.Api.Models.Wine", "Wine")
-                        .WithMany("OrderItems")
+                        .WithMany()
                         .HasForeignKey("WineId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Order");
@@ -248,11 +236,6 @@ namespace WineryApp.Api.Migrations
             modelBuilder.Entity("WineryApp.Api.Models.Role", b =>
                 {
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("WineryApp.Api.Models.Wine", b =>
-                {
-                    b.Navigation("OrderItems");
                 });
 #pragma warning restore 612, 618
         }

@@ -5,7 +5,7 @@ import "./App.css";
 
 import WinesPage from "./pages/WinesPage";
 import UsersPage from "./pages/UsersPage";
-import OrdersPage from "./pages/OrdersPage"; // OrdersPage додадено
+import OrdersPage from "./pages/OrdersPage"; 
 import HomePage from "./pages/HomePage";
 
 function App() {
@@ -23,7 +23,7 @@ function App() {
                 <Link className="nav-link" to="/users">Users</Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/orders">Orders</Link> {/* Orders линк */}
+                <Link className="nav-link" to="/orders">Orders</Link> 
               </li>
             </ul>
           </div>
@@ -34,7 +34,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/wines" element={<WinesPage />} />
         <Route path="/users" element={<UsersPage />} />
-        <Route path="/orders" element={<OrdersPage />} /> {/* OrdersPage рут */}
+        <Route path="/orders" element={<OrdersPage />} /> 
       </Routes>
     </Router>
   );

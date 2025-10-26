@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using WineryApp.Api.Data;
 using WineryApp.Api.Models;
-using WineryApp.Api.Services;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace WineryApp.Api.Controllers
 {
@@ -9,44 +10,76 @@ namespace WineryApp.Api.Controllers
     [Route("api/[controller]")]
     public class WinesController : ControllerBase
     {
-        private readonly WineService _wineService;
+        private readonly AppDbContext _context;
 
-        public WinesController(WineService wineService)
+        public WinesController(AppDbContext context)
         {
-            _wineService = wineService;
+            _context = context;
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Wine>> GetAll() => Ok(_wineService.GetAll());
+        public ActionResult<IEnumerable<Wine>> GetAll()
+        {
+            return Ok(_context.Wines.Where(w => !w.IsDeleted).ToList());
+        }
 
         [HttpGet("{id}")]
         public ActionResult<Wine> GetById(int id)
         {
-            var wine = _wineService.GetById(id);
-            if (wine == null) return NotFound();
+            var wine = _context.Wines.FirstOrDefault(w => w.Id == id && !w.IsDeleted);
+            if (wine == null)
+                return NotFound();
+
             return Ok(wine);
         }
 
         [HttpPost]
         public ActionResult<Wine> Add([FromBody] Wine wine)
         {
-            var created = _wineService.Add(wine);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            if (wine == null)
+                return BadRequest("Invalid wine data.");
+
+            _context.Wines.Add(wine);
+            _context.SaveChanges();
+
+            return CreatedAtAction(nameof(GetById), new { id = wine.Id }, wine);
         }
 
         [HttpPut("{id}")]
         public IActionResult Update(int id, [FromBody] Wine wine)
         {
-            var success = _wineService.Update(id, wine);
-            if (!success) return NotFound();
+            var existing = _context.Wines.FirstOrDefault(w => w.Id == id && !w.IsDeleted);
+            if (existing == null)
+                return NotFound();
+
+            existing.Name = wine.Name;
+            existing.Winery = wine.Winery;
+            existing.Year = wine.Year;
+            existing.Type = wine.Type;
+            existing.Price = wine.Price;
+            existing.StockQuantity = wine.StockQuantity;
+
+            _context.SaveChanges();
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var success = _wineService.Delete(id);
-            if (!success) return NotFound();
+            var wine = _context.Wines.FirstOrDefault(w => w.Id == id);
+            if (wine == null)
+                return NotFound();
+
+            bool isUsedInOrders = _context.OrderItems.Any(o => o.WineId == id);
+            if (isUsedInOrders)
+            {
+                wine.IsDeleted = true;
+                _context.SaveChanges();
+                return NoContent();
+            }
+
+            _context.Wines.Remove(wine);
+            _context.SaveChanges();
             return NoContent();
         }
     }
