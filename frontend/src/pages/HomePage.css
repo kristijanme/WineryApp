@@ -10,11 +10,16 @@
   position: relative;
   color: white;
   overflow: hidden;
-  transition: transform 10s ease-in-out;
+  animation: zoomIn 30s ease-in-out infinite alternate; /* 🎥 smooth zoom animation */
 }
 
-.homepage-hero:hover {
-  transform: scale(1.05);
+@keyframes zoomIn {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.1);
+  }
 }
 
 .homepage-hero::before {
@@ -29,6 +34,18 @@
   z-index: 1;
   text-align: center;
   padding: 2rem;
+  animation: fadeIn 2.5s ease-in-out; /* ✨ text fade-in */
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .hero-title {
@@ -42,6 +59,7 @@
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
   margin-top: 1rem;
 }
+
 
 .homepage-overlay {
   animation: fadeIn 1.8s ease-in-out;

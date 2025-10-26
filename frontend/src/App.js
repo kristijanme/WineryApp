@@ -5,15 +5,17 @@ import "./App.css";
 
 import WinesPage from "./pages/WinesPage";
 import UsersPage from "./pages/UsersPage";
-import OrdersPage from "./pages/OrdersPage"; 
+import OrdersPage from "./pages/OrdersPage";
 import HomePage from "./pages/HomePage";
 
 function App() {
   return (
     <Router>
-      <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+      <nav className="navbar navbar-expand-lg navbar-dark navbar-glass fixed-top">
         <div className="container">
-          <Link className="navbar-brand text-danger fw-bold" to="/">Winery App</Link>
+          <Link className="navbar-brand fw-bold" to="/">
+            🍷 Winery App
+          </Link>
           <div className="collapse navbar-collapse">
             <ul className="navbar-nav ms-auto">
               <li className="nav-item">
@@ -23,7 +25,7 @@ function App() {
                 <Link className="nav-link" to="/users">Users</Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/orders">Orders</Link> 
+                <Link className="nav-link" to="/orders">Orders</Link>
               </li>
             </ul>
           </div>
@@ -34,10 +36,10 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/wines" element={<WinesPage />} />
         <Route path="/users" element={<UsersPage />} />
-        <Route path="/orders" element={<OrdersPage />} /> 
+        <Route path="/orders" element={<OrdersPage />} />
       </Routes>
     </Router>
   );
 }
 
-export default App;
+export default App;  // ✅ ensure this is at the bottom
